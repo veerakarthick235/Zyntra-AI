@@ -1,11 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-  <link rel="icon" type="image/png" href="{{ url_for('static', filename='Zyntra-AI.png') }}">
-
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Zyntra AI</title>
+  <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='Zyntra AI.jpg') }}" />
   <style>
     body {
       margin: 0;
@@ -24,28 +22,9 @@
       width: 460px;
       padding: 25px;
       border-radius: 20px;
-      background: rgba(255, 255, 255, 0.9);
-      body {
-      margin: 0;
-      padding: 0;
-      background: #fff; /* plain white */
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #003366;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    .chat-container {
-      width: 460px;
-      padding: 25px;
-      border-radius: 20px;
-      background: #87CEEB; /* sky blue */
-      box-shadow:
-        0 0 20px 6px rgba(135, 206, 235, 0.8),
-        inset 0 0 15px rgba(255, 255, 255, 0.4);
+      background: #87CEEB;
+      box-shadow: 0 0 20px 6px rgba(135, 206, 235, 0.8),
+                  inset 0 0 15px rgba(255, 255, 255, 0.4);
       transition: transform 0.3s ease, box-shadow 0.3s ease;
       color: #003366;
       user-select: none;
@@ -53,7 +32,7 @@
 
     .chat-container:hover {
       transform: translateY(-5px);
-      box-shadow: 0 0 30px 10px rgb(6, 80, 110);
+      box-shadow: 0 12px 40px rgba(0, 102, 204, 0.3);
     }
 
     #chatbox {
@@ -74,10 +53,6 @@
       width: 6px;
     }
 
-    #chatbox::-webkit-scrollbar-track {
-      background: #e6f2ff;
-    }
-
     #chatbox::-webkit-scrollbar-thumb {
       background-color: #4da6ff;
       border-radius: 3px;
@@ -88,22 +63,18 @@
       padding: 12px;
       border-radius: 8px;
       line-height: 1.4;
-      box-shadow: 0 2px 5px rgba(0, 102, 204, 0.1);
       font-weight: 600;
+      box-shadow: 0 2px 5px rgba(0, 102, 204, 0.1);
     }
 
     .user {
       background: #d9ecff;
       text-align: right;
-      border-bottom-right-radius: 2px;
-      color: #003366;
     }
 
     .bot {
       background: #f0f8ff;
       text-align: left;
-      border-bottom-left-radius: 2px;
-      color: #003366;
     }
 
     .input-row {
@@ -122,187 +93,39 @@
       color: #003366;
       font-size: 14px;
       outline: none;
-      transition: 0.3s;
       font-weight: 600;
+      transition: 0.3s;
     }
 
     input[type="text"]:focus {
       border-color: #4da6ff;
       box-shadow: 0 0 8px rgba(0, 153, 255, 0.3);
-      background: #e6f2ff;
-      color: #003366;
     }
 
     #micButton, #sendButton {
-      flex-shrink: 0;
       padding: 12px 16px;
       border-radius: 8px;
       font-weight: bold;
       cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
-      transition: all 0.3s ease;
-      user-select: none;
       border: none;
       color: white;
       background: #0077cc;
-    }
-
-    #micButton {
-      width: 44px;
+      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+      transition: all 0.3s ease;
       height: 44px;
-      font-size: 18px;
       display: flex;
       align-items: center;
       justify-content: center;
     }
 
-    #micButton:hover {
-      background: #005ea3;
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 6px 20px rgba(0, 102, 204, 0.6);
-    }
-
-    #micButton.listening {
-      background-color: #ff4d4d;
-      animation: pulse 1.5s infinite;
-      box-shadow: 0 0 15px 6px rgba(255, 77, 77, 0.9);
-      transform: scale(1.1);
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
-    }
-
-    #sendButton:hover {
-      background: #005ea3;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 14px rgba(0, 102, 204, 0.5);
-    }
-
-    h1 {
-      color: #003366;
-      text-align: center;
-      margin-bottom: 20px;
-      font-weight: 700;
-      user-select: none;
-    }box-shadow:
-        0 8px 32px rgba(0, 102, 204, 0.2),
-        inset 0 0 15px rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(6px);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-    }
-
-    .chat-container:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 40px rgba(0, 102, 204, 0.3);
-    }
-
-    #chatbox {
-      height: 330px;
-      overflow-y: auto;
-      background: rgba(255, 255, 255, 0.7);
-      border: 1px solid #b3d9ff;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 15px;
-      font-size: 15px;
-      scrollbar-width: thin;
-      scrollbar-color: #4da6ff #e6f2ff;
-    }
-
-    #chatbox::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    #chatbox::-webkit-scrollbar-track {
-      background: #e6f2ff;
-    }
-
-    #chatbox::-webkit-scrollbar-thumb {
-      background-color: #4da6ff;
-      border-radius: 3px;
-    }
-
-    .user, .bot {
-      margin: 10px 0;
-      padding: 12px;
-      border-radius: 8px;
-      line-height: 1.4;
-      box-shadow: 0 2px 5px rgba(0, 102, 204, 0.1);
-    }
-
-    .user {
-      background: #d9ecff;
-      text-align: right;
-      border-bottom-right-radius: 2px;
-    }
-
-    .bot {
-      background: #f0f8ff;
-      text-align: left;
-      border-bottom-left-radius: 2px;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #b3d9ff;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.8);
-      color: #003366;
-      font-size: 14px;
-      outline: none;
-      transition: 0.3s;
-    }
-
-    input[type="text"]:focus {
-      border-color: #4da6ff;
-      box-shadow: 0 0 8px rgba(0, 153, 255, 0.2);
-    }
-
-    button {
-      padding: 12px 16px;
-      background: #0077cc;
-      border: none;
-      border-radius: 8px;
-      color: white;
-      font-weight: bold;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
-      transition: all 0.3s ease;
-    }
-
-    button:hover {
-      background: #006bb3;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 102, 204, 0.3);
-    }
-
     #micButton {
-      background: #0077cc;
-      color: white;
-      border-radius: 50%;
       width: 44px;
-      height: 44px;
       font-size: 18px;
-      border: none;
-      cursor: pointer;
-      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.2);
-      transition: all 0.3s ease;
     }
 
-    #micButton:hover {
-      background: #006bb3;
-      transform: translateY(-2px) scale(1.05);
+    #micButton:hover, #sendButton:hover {
+      background: #005ea3;
+      transform: translateY(-2px);
     }
 
     #micButton.listening {
@@ -316,15 +139,9 @@
       100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
     }
 
-    #sendButton {
-      width: 100%;
-    }
-
     h1 {
-      color: #0077cc;
       text-align: center;
       margin-bottom: 20px;
-      font-weight: 600;
     }
   </style>
 </head>
@@ -332,12 +149,11 @@
   <div class="chat-container">
     <h1>Zyntra AI</h1>
     <div id="chatbox"></div>
-
     <div class="input-row">
       <input type="text" id="userInput" placeholder="Speak or type your message...">
       <button id="micButton" onclick="toggleMic()">🎤</button>
+      <button id="sendButton" onclick="sendMessage()">Send</button>
     </div>
-    <button id="sendButton" onclick="sendMessage()">Send</button>
   </div>
 
   <script>
@@ -372,32 +188,25 @@
     }
 
     document.getElementById("userInput").addEventListener("keypress", function (e) {
-      if (e.key === "Enter") {
-        sendMessage();
-      }
+      if (e.key === "Enter") sendMessage();
     });
 
-    // 🎤 Web Speech API (Speech-to-Text)
-    const micButton = document.getElementById("micButton");
-    let recognition;
-    let listening = false;
-
+    let recognition, listening = false;
     function toggleMic() {
+      const micButton = document.getElementById("micButton");
       if (!('webkitSpeechRecognition' in window)) {
-        alert("Speech recognition not supported. Please use Google Chrome.");
+        alert("Speech recognition not supported in this browser.");
         return;
       }
 
       if (!recognition) {
         recognition = new webkitSpeechRecognition();
-        recognition.continuous = false;
+        recognition.lang = 'ta-IN';  // Tamil
         recognition.interimResults = false;
-        recognition.lang = 'en-US';
-        recognition.lang = 'ta-IN';
+        recognition.continuous = false;
 
         recognition.onresult = function(event) {
-          const transcript = event.results[0][0].transcript;
-          document.getElementById("userInput").value = transcript;
+          document.getElementById("userInput").value = event.results[0][0].transcript;
           sendMessage();
         };
 
@@ -405,52 +214,30 @@
           alert("Speech recognition error: " + event.error);
         };
 
-        recognition.onend = function() {
-          listening = false;
+        recognition.onend = () => {
           micButton.classList.remove("listening");
+          listening = false;
         };
       }
 
       if (!listening) {
         recognition.start();
-        listening = true;
         micButton.classList.add("listening");
+        listening = true;
       } else {
         recognition.stop();
-        listening = false;
-        micButton.classList.remove("listening");
       }
     }
-    // Disable right-click context menu
-    
-  // Disable right-click
-  document.addEventListener("contextmenu", function (e) {
-    e.preventDefault();
-  });
 
-  // Disable common shortcut keys for viewing source and developer tools
-  document.addEventListener("keydown", function (e) {
-    // F12
-    if (e.keyCode === 123) {
-      e.preventDefault();
-    }
-
-    // Ctrl+Shift+I or Ctrl+Shift+J
-    if ((e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74))) {
-      e.preventDefault();
-    }
-
-    // Ctrl+U
-    if (e.ctrlKey && e.keyCode === 85) {
-      e.preventDefault();
-    }
-
-    // Ctrl+Shift+C (Element picker)
-    if (e.ctrlKey && e.shiftKey && e.keyCode === 67) {
-      e.preventDefault();
-    }
-  });
-  
+    // Disable right-click and common dev tools shortcuts
+    document.addEventListener("contextmenu", e => e.preventDefault());
+    document.addEventListener("keydown", e => {
+      if (
+        e.keyCode === 123 || // F12
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || // Ctrl+Shift+I/J/C
+        (e.ctrlKey && e.key === 'u') // Ctrl+U
+      ) e.preventDefault();
+    });
   </script>
 </body>
 </html>
