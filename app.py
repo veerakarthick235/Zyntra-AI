@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # Replace this with your actual Gemini API key
-GEMINI_API_KEY = "AIzaSyDjdZ1apX7RhmgKz7VRCTipZAtmpv9XTNU"
+GEMINI_API_KEY = "AIzaSyBAf1ecQGpJDyFmm2aXvy_9y9XkeirBubw"
 GEMINI_API_URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
 
 @app.route("/")
