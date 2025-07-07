@@ -4,146 +4,8 @@
   <meta charset="UTF-8" />
   <title>Zyntra AI</title>
   <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='Zyntra AI.jpg') }}" />
-  <style>
-    body {
-      margin: 0;
-      padding: 0;
-      background: linear-gradient(135deg, #e6f2ff, rgb(173, 225, 246));
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      color: #003366;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      overflow: hidden;
-    }
-
-    .chat-container {
-      width: 460px;
-      padding: 25px;
-      border-radius: 20px;
-      background: #87CEEB;
-      box-shadow: 0 0 20px 6px rgba(135, 206, 235, 0.8),
-                  inset 0 0 15px rgba(255, 255, 255, 0.4);
-      transition: transform 0.3s ease, box-shadow 0.3s ease;
-      color: #003366;
-      user-select: none;
-    }
-
-    .chat-container:hover {
-      transform: translateY(-5px);
-      box-shadow: 0 12px 40px rgba(0, 102, 204, 0.3);
-    }
-
-    #chatbox {
-      height: 330px;
-      overflow-y: auto;
-      background: rgba(255, 255, 255, 0.85);
-      border: 1px solid #b3d9ff;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 15px;
-      font-size: 15px;
-      color: #003366;
-      scrollbar-width: thin;
-      scrollbar-color: #4da6ff #e6f2ff;
-    }
-
-    #chatbox::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    #chatbox::-webkit-scrollbar-thumb {
-      background-color: #4da6ff;
-      border-radius: 3px;
-    }
-
-    .user, .bot {
-      margin: 10px 0;
-      padding: 12px;
-      border-radius: 8px;
-      line-height: 1.4;
-      font-weight: 600;
-      box-shadow: 0 2px 5px rgba(0, 102, 204, 0.1);
-    }
-
-    .user {
-      background: #d9ecff;
-      text-align: right;
-    }
-
-    .bot {
-      background: #f0f8ff;
-      text-align: left;
-    }
-
-    .input-row {
-      display: flex;
-      gap: 10px;
-      margin-bottom: 10px;
-      align-items: center;
-    }
-
-    input[type="text"] {
-      flex: 1;
-      padding: 12px;
-      border: 1px solid #b3d9ff;
-      border-radius: 10px;
-      background: rgba(255, 255, 255, 0.9);
-      color: #003366;
-      font-size: 14px;
-      outline: none;
-      font-weight: 600;
-      transition: 0.3s;
-    }
-
-    input[type="text"]:focus {
-      border-color: #4da6ff;
-      box-shadow: 0 0 8px rgba(0, 153, 255, 0.3);
-    }
-
-    #micButton, #sendButton {
-      padding: 12px 16px;
-      border-radius: 8px;
-      font-weight: bold;
-      cursor: pointer;
-      border: none;
-      color: white;
-      background: #0077cc;
-      box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
-      transition: all 0.3s ease;
-      height: 44px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    #micButton {
-      width: 44px;
-      font-size: 18px;
-    }
-
-    #micButton:hover, #sendButton:hover {
-      background: #005ea3;
-      transform: translateY(-2px);
-    }
-
-    #micButton.listening {
-      background-color: #ff4d4d;
-      animation: pulse 1.5s infinite;
-    }
-
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(255, 77, 77, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 77, 77, 0); }
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-    }
-  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+  
 </head>
 <body>
   <div class="chat-container">
@@ -229,13 +91,13 @@
       }
     }
 
-    // Disable right-click and common dev tools shortcuts
+    
     document.addEventListener("contextmenu", e => e.preventDefault());
     document.addEventListener("keydown", e => {
       if (
         e.keyCode === 123 || // F12
-        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || // Ctrl+Shift+I/J/C
-        (e.ctrlKey && e.key === 'u') // Ctrl+U
+        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || 
+        (e.ctrlKey && e.key === 'u') 
       ) e.preventDefault();
     });
   </script>
