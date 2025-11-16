@@ -2,68 +2,264 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Zyntra AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zyntra AI - Futuristic Intelligence</title>
   <link rel="icon" type="image/jpg" href="{{ url_for('static', filename='Zyntra AI.jpg') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
-  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@300;500;700&display=swap" rel="stylesheet">
 </head>
 <body>
+  
+  <!-- Background Animation -->
+  <div class="bg-animation">
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+    <div class="cube"></div>
+  </div>
+
   <div class="chat-container">
-    <h1>Zyntra AI</h1>
-    <div id="chatbox"></div>
-    <div class="input-row">
-      <input type="text" id="userInput" placeholder="Speak or type your message...">
-      <button id="micButton" onclick="toggleMic()">🎤</button>
-      <button id="sendButton" onclick="sendMessage()">Send</button>
+    
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="logo-section">
+        <div class="ai-orb"></div>
+        <h1>ZYNTRA <span class="ai-text">AI</span></h1>
+      </div>
+      
+      <div class="controls">
+        <button class="control-btn" onclick="toggleTheme()" title="Toggle Theme">
+          <i class="fas fa-adjust"></i>
+        </button>
+        <button class="control-btn" onclick="exportChat()" title="Export Chat">
+          <i class="fas fa-download"></i>
+        </button>
+        <button class="control-btn danger" onclick="clearChat()" title="Clear Chat">
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </div>
     </div>
+
+    <!-- Chat Box -->
+    <div id="chatbox">
+      <div class="welcome-message">
+        <div class="welcome-icon">🤖</div>
+        <h2>Welcome to Zyntra AI</h2>
+        <p>Your advanced AI assistant powered by Gemini 2.0</p>
+        <div class="feature-chips">
+          <span class="chip"><i class="fas fa-brain"></i> Smart Conversations</span>
+          <span class="chip"><i class="fas fa-language"></i> Tamil Speech</span>
+          <span class="chip"><i class="fas fa-bolt"></i> Real-time Responses</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Input Area -->
+    <div class="input-section">
+      <div class="input-wrapper">
+        <button class="feature-btn" onclick="toggleMic()" id="micButton" title="Voice Input">
+          <i class="fas fa-microphone"></i>
+        </button>
+        
+        <input 
+          type="text" 
+          id="userInput" 
+          placeholder="Ask me anything..." 
+          autocomplete="off"
+        />
+        
+        <button class="feature-btn" onclick="toggleSpeech()" id="speakerButton" title="Text-to-Speech">
+          <i class="fas fa-volume-up"></i>
+        </button>
+        
+        <button class="send-btn" onclick="sendMessage()" id="sendButton">
+          <i class="fas fa-paper-plane"></i>
+          <span>Send</span>
+        </button>
+      </div>
+      
+      <div class="status-bar">
+        <span id="statusText">Ready</span>
+        <span class="typing-indicator" id="typingIndicator" style="display: none;">
+          <span></span><span></span><span></span>
+        </span>
+      </div>
+    </div>
+
   </div>
 
   <script>
+    // Configuration
+    const SESSION_ID = 'user_' + Date.now();
+    let speechEnabled = false;
+    let currentTheme = 'dark';
+    let messageCounter = 0;
+
+    // Send Message Function with Streaming Effect
     async function sendMessage() {
       const inputField = document.getElementById("userInput");
       const userText = inputField.value.trim();
       if (!userText) return;
 
       const chatbox = document.getElementById("chatbox");
-      chatbox.innerHTML += `<div class="user">You: ${userText}</div>`;
+      
+      // Remove welcome message
+      const welcomeMsg = chatbox.querySelector('.welcome-message');
+      if (welcomeMsg) welcomeMsg.remove();
+      
+      // Add user message
+      addMessage('user', userText);
       inputField.value = "";
-      inputField.disabled = true;
-      document.getElementById("sendButton").disabled = true;
+      setInputState(true);
+      showTypingIndicator(true);
 
       try {
         const response = await fetch("/chat", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ message: userText })
+          body: JSON.stringify({ 
+            message: userText,
+            session_id: SESSION_ID 
+          })
         });
 
         const data = await response.json();
-        chatbox.innerHTML += `<div class="bot">Zyntra: ${data.response}</div>`;
+        showTypingIndicator(false);
+        
+        // Streaming typewriter effect
+        await typeMessage('bot', data.response);
+        
+        // Text-to-speech if enabled
+        if (speechEnabled) {
+          speak(data.response);
+        }
+
       } catch (error) {
-        chatbox.innerHTML += `<div class="bot">Error: Could not connect to server</div>`;
+        showTypingIndicator(false);
+        addMessage('bot', '⚠️ Connection error. Please try again.');
       }
 
-      chatbox.scrollTop = chatbox.scrollHeight;
-      inputField.disabled = false;
-      document.getElementById("sendButton").disabled = false;
+      setInputState(false);
       inputField.focus();
     }
 
-    document.getElementById("userInput").addEventListener("keypress", function (e) {
-      if (e.key === "Enter") sendMessage();
-    });
+    // Add message to chatbox
+    function addMessage(role, text) {
+      const chatbox = document.getElementById("chatbox");
+      const messageDiv = document.createElement('div');
+      messageDiv.className = `message ${role}-message`;
+      messageDiv.id = `msg-${messageCounter++}`;
+      
+      const avatar = document.createElement('div');
+      avatar.className = 'avatar';
+      avatar.innerHTML = role === 'user' ? '<i class="fas fa-user"></i>' : '<i class="fas fa-robot"></i>';
+      
+      const content = document.createElement('div');
+      content.className = 'message-content';
+      
+      const textDiv = document.createElement('div');
+      textDiv.className = 'text';
+      textDiv.innerHTML = formatMessage(text);
+      
+      const actions = document.createElement('div');
+      actions.className = 'message-actions';
+      actions.innerHTML = `
+        <button onclick="copyMessage('${messageDiv.id}')" title="Copy">
+          <i class="fas fa-copy"></i>
+        </button>
+        ${role === 'bot' ? `
+        <button onclick="speakMessage('${messageDiv.id}')" title="Speak">
+          <i class="fas fa-volume-up"></i>
+        </button>` : ''}
+      `;
+      
+      content.appendChild(textDiv);
+      content.appendChild(actions);
+      messageDiv.appendChild(avatar);
+      messageDiv.appendChild(content);
+      
+      chatbox.appendChild(messageDiv);
+      chatbox.scrollTop = chatbox.scrollHeight;
+      
+      return messageDiv;
+    }
 
+    // Typewriter effect
+    async function typeMessage(role, text) {
+      const messageDiv = addMessage(role, '');
+      const textDiv = messageDiv.querySelector('.text');
+      
+      let index = 0;
+      const words = text.split(' ');
+      
+      for (let word of words) {
+        textDiv.innerHTML = formatMessage(words.slice(0, ++index).join(' '));
+        await new Promise(resolve => setTimeout(resolve, 30));
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+      }
+    }
+
+    // Format message with markdown-like support
+    function formatMessage(text) {
+      return text
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/`(.*?)`/g, '<code>$1</code>')
+        .replace(/\n/g, '<br>')
+        .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank">$1</a>');
+    }
+
+    // Copy message
+    function copyMessage(msgId) {
+      const msg = document.getElementById(msgId);
+      const text = msg.querySelector('.text').innerText;
+      navigator.clipboard.writeText(text);
+      showStatus('Copied to clipboard!');
+    }
+
+    // Speak message
+    function speakMessage(msgId) {
+      const msg = document.getElementById(msgId);
+      const text = msg.querySelector('.text').innerText;
+      speak(text);
+    }
+
+    // Text-to-Speech
+    function speak(text) {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;
+        utterance.pitch = 1;
+        utterance.lang = 'en-US';
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    // Toggle Speech
+    function toggleSpeech() {
+      speechEnabled = !speechEnabled;
+      const btn = document.getElementById('speakerButton');
+      btn.classList.toggle('active', speechEnabled);
+      showStatus(speechEnabled ? 'Text-to-Speech ON' : 'Text-to-Speech OFF');
+    }
+
+    // Voice Recognition
     let recognition, listening = false;
     function toggleMic() {
       const micButton = document.getElementById("micButton");
-      if (!('webkitSpeechRecognition' in window)) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      
+      if (!SpeechRecognition) {
         alert("Speech recognition not supported in this browser.");
         return;
       }
 
       if (!recognition) {
-        recognition = new webkitSpeechRecognition();
-        recognition.lang = 'ta-IN';  // Tamil
+        recognition = new SpeechRecognition();
+        recognition.lang = 'ta-IN';
         recognition.interimResults = false;
         recognition.continuous = false;
 
@@ -73,7 +269,9 @@
         };
 
         recognition.onerror = function(event) {
-          alert("Speech recognition error: " + event.error);
+          showStatus('Speech recognition error: ' + event.error);
+          micButton.classList.remove("listening");
+          listening = false;
         };
 
         recognition.onend = () => {
@@ -86,20 +284,93 @@
         recognition.start();
         micButton.classList.add("listening");
         listening = true;
+        showStatus('Listening...');
       } else {
         recognition.stop();
       }
     }
 
-    
-    document.addEventListener("contextmenu", e => e.preventDefault());
-    document.addEventListener("keydown", e => {
-      if (
-        e.keyCode === 123 || // F12
-        (e.ctrlKey && e.shiftKey && ['I', 'J', 'C'].includes(e.key)) || 
-        (e.ctrlKey && e.key === 'u') 
-      ) e.preventDefault();
+    // Clear Chat
+    async function clearChat() {
+      if (!confirm('Clear all chat history?')) return;
+      
+      try {
+        await fetch("/clear", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ session_id: SESSION_ID })
+        });
+        
+        document.getElementById("chatbox").innerHTML = `
+          <div class="welcome-message">
+            <div class="welcome-icon">🤖</div>
+            <h2>Welcome to Zyntra AI</h2>
+            <p>Your advanced AI assistant powered by Gemini 2.0</p>
+            <div class="feature-chips">
+              <span class="chip"><i class="fas fa-brain"></i> Smart Conversations</span>
+              <span class="chip"><i class="fas fa-language"></i> Tamil Speech</span>
+              <span class="chip"><i class="fas fa-bolt"></i> Real-time Responses</span>
+            </div>
+          </div>
+        `;
+        messageCounter = 0;
+        showStatus('Chat cleared');
+      } catch (error) {
+        showStatus('Error clearing chat');
+      }
+    }
+
+    // Export Chat
+    function exportChat() {
+      const messages = Array.from(document.querySelectorAll('.message')).map(msg => {
+        const role = msg.classList.contains('user-message') ? 'You' : 'Zyntra AI';
+        const text = msg.querySelector('.text').innerText;
+        return `${role}: ${text}`;
+      }).join('\n\n');
+      
+      const blob = new Blob([messages], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `zyntra-chat-${new Date().toISOString()}.txt`;
+      a.click();
+      showStatus('Chat exported');
+    }
+
+    // Toggle Theme
+    function toggleTheme() {
+      currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+      document.body.setAttribute('data-theme', currentTheme);
+      showStatus(`${currentTheme === 'dark' ? 'Dark' : 'Light'} mode activated`);
+    }
+
+    // Helper Functions
+    function setInputState(disabled) {
+      document.getElementById("userInput").disabled = disabled;
+      document.getElementById("sendButton").disabled = disabled;
+    }
+
+    function showTypingIndicator(show) {
+      document.getElementById("typingIndicator").style.display = show ? 'flex' : 'none';
+      document.getElementById("statusText").style.display = show ? 'none' : 'inline';
+    }
+
+    function showStatus(text) {
+      const statusEl = document.getElementById("statusText");
+      statusEl.textContent = text;
+      setTimeout(() => statusEl.textContent = 'Ready', 3000);
+    }
+
+    // Enter key to send
+    document.getElementById("userInput").addEventListener("keypress", function (e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
     });
+
+    // Initialize theme
+    document.body.setAttribute('data-theme', 'dark');
   </script>
 </body>
 </html>
