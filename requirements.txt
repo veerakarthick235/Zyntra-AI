@@ -1,3 +1,4 @@
-Flask
-requests
+Flask==3.0.0
 gunicorn
+google-generativeai
+python-dotenv
